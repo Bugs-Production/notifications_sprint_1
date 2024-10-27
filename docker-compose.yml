@@ -1,0 +1,80 @@
+services:
+  notification_api:
+    build:
+      dockerfile: Dockerfile
+      context: ./notification_api
+    container_name: notification_api_service
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - notification_network
+    volumes:
+      - ./notification_api/src:/notification_api/src
+      - ./notification_api/logs/:/var/log/app/
+
+  celery_workers:
+    build:
+      dockerfile: celery.Dockerfile
+      context: ./notification_api
+    container_name: celery_workers
+    depends_on:
+      - rabbitmq
+      - notification_api
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - notification_network
+
+  nginx:
+    container_name: notification_nginx
+    build:
+      context: ./nginx/.
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf
+      - ./nginx/logs/:/var/log/nginx/
+    depends_on:
+      - notification_api
+    ports:
+      - "80:80"
+    networks:
+      - notification_network
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - notification_network
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_tasks
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    env_file: .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    networks:
+      - notification_network
+
+networks:
+  notification_network:
+
+volumes:
+  postgres_data:
