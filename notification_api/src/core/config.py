@@ -9,6 +9,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     project_name: str = Field("notification_api", alias="PROJECT_NAME")
+    broker_url: str = Field("amqp://user:password@rabbitmq:5672/", alias="BROKER_URL")
 
 
 settings = Settings()
