@@ -57,13 +57,13 @@ jobs:
             🔖 Commit: ${{ github.sha }}
             👤 Author: ${{ github.actor }}
             
-            ${{#success()}}
+            ${{#if success()}}
             🎉 The pipeline completed **successfully**! Good job! ✅
-            ${{/success()}}
+            ${{/if}}
             
-            ${{#failure()}}
-            ⚠️ The pipeline **failed** on step: ${{ failure() }} ❌
+            ${{#if failure()}}
+            ⚠️ The pipeline **failed** on step: ${{ github.job }} ❌
             Please review the logs and fix the issue.
-            ${{/failure()}}
+            ${{/if}}
             
             Pull Request: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
