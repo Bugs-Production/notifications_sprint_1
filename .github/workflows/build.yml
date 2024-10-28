@@ -42,12 +42,12 @@ jobs:
         run: |
           isort --check notification_api     
 
-  notify:
+  notify_success:
     runs-on: ubuntu-latest
     needs: lint
+    if: success()
     steps:
-      - name: Send Telegram Notification
-        if: always()
+      - name: Send Telegram Success Notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -57,13 +57,27 @@ jobs:
             🔖 Commit: ${{ github.sha }}
             👤 Author: ${{ github.actor }}
             
-            ${{#if success()}}
             🎉 The pipeline completed **successfully**! Good job! ✅
-            ${{/if}}
-            
-            ${{#if failure()}}
-            ⚠️ The pipeline **failed** on step: ${{ github.job }} ❌
-            Please review the logs and fix the issue.
-            ${{/if}}
             
             Pull Request: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+
+  notify_failure:
+    runs-on: ubuntu-latest
+    needs: lint
+    if: failure()
+    steps:
+      - name: Send Telegram Failure Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🚀 Repository: ${{ github.repository }}
+            🔖 Commit: ${{ github.sha }}
+            👤 Author: ${{ github.actor }}
+
+            ⚠️ The pipeline **failed** on step: ${{ github.job }} ❌
+            Please review the logs and fix the issue.
+
+            Pull Request: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+            
