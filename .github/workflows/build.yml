@@ -57,7 +57,7 @@ jobs:
             🔖 Commit: ${{ github.sha }}
             👤 Author: ${{ github.actor }}
             
-            🎉 The pipeline completed **successfully**! Good job! ✅
+            🎉 The pipeline completed successfully! Good job! ✅
             
             Pull Request: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
@@ -76,7 +76,7 @@ jobs:
             🔖 Commit: ${{ github.sha }}
             👤 Author: ${{ github.actor }}
 
-            ⚠️ The pipeline **failed** on step: ${{ github.job }} ❌
+            ⚠️ The pipeline failed on step: ${{ toJson(steps) }} ❌
             Please review the logs and fix the issue.
 
             Pull Request: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
