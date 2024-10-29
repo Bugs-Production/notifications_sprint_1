@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     postgres_url: str = Field(
         "postgresql+asyncpg://postgres:postgres@db:5432/foo", alias="POSTGRES_URL"
     )
-    engine_echo: bool = Field(False, alias="ENGINE_ECHO")
+    engine_echo: bool = Field(default=False, alias="ENGINE_ECHO")
 
 
 settings = Settings()
