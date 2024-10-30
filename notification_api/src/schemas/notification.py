@@ -4,7 +4,7 @@ from typing import Type
 from pydantic import BaseModel
 
 
-class NotificationType(str, Enum):
+class NotificationType(Enum):
     REGISTRATION = "registration"
     MOVIE_RECOMMENDATION = "movies_recommendation"
     LIKE_NOTIFICATION = "likes_reviews"
@@ -30,7 +30,7 @@ class LikeReviewsEvent(BaseEvent):
     post_link: str
 
 
-NOTIFICATION_MAP: dict[str, Type[BaseModel]] = {
+NOTIFICATION_MAP: dict[NotificationType, Type[BaseModel]] = {
     NotificationType.REGISTRATION: RegistrationEvent,
     NotificationType.MOVIE_RECOMMENDATION: MovieRecommendationEvent,
     NotificationType.LIKE_NOTIFICATION: LikeReviewsEvent,
