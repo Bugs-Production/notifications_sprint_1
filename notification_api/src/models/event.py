@@ -9,7 +9,8 @@ from db.postgres import Base
 
 class ChannelEnum(enum.Enum):
     EMAIL = "email"
-    WEBSOCKET = "websocket" # не используем, но предполагаем для будущей реализации
+    WEBSOCKET = "websocket"  # не используем, но предполагаем для будущей реализации
+
 
 class EventTypesEnum(enum.Enum):
     REGISTRATION = "registration"
@@ -21,13 +22,15 @@ class EventTypesEnum(enum.Enum):
     SALE = "sale"
     PROMOTION = "promotion"
 
+
 class EventStatusEnum(enum.Enum):
     INIT = "init"
     SUCCESS = "success"
     FAILED = "failed"
 
+
 class Event(Base):
-    __tablename__ = 'events'
+    __tablename__ = "events"
     id = Column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -39,7 +42,7 @@ class Event(Base):
     type = Column(Enum(EventTypesEnum), nullable=False)
     date = Column(DateTime, default=func.now(), nullable=False)
     channel = Column(Enum(ChannelEnum), nullable=False)
-    send_date = Column(DateTime, nullable=True)    # None - для мгновенных нотификаций
+    send_date = Column(DateTime, nullable=True)  # None - для мгновенных нотификаций
     send_to = Column(JSON, nullable=True)  # None - рассылка всем
     send_from = Column(String, nullable=False)
     status = Column(Enum(EventStatusEnum), nullable=False)
