@@ -1,10 +1,9 @@
-from sqlalchemy import Column, DateTime, String, func, Text, Enum, JSON
-from sqlalchemy.dialects.postgresql import UUID
 import enum
-
 import uuid
 
 from db.postgres import Base
+from sqlalchemy import JSON, Column, DateTime, Enum, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
 
 
 class ChannelEnum(enum.Enum):
