@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		body {
+			background: url("https://plus.unsplash.com/premium_photo-1682125771198-f7cbed7cb868?q=80&w=2660&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+			no-repeat center center fixed;
+			background-size: cover;
+			color: rgb(198, 198, 198);
+			font-family: Arial, sans-serif;
+		}
+		.container {
+			text-shadow: 2px 2px 5px #000000;
+			background: rgba(0, 0, 0, 0.7);
+			padding: 20px;
+			margin: 50px auto;
+			width: 80%;
+			border-radius: 10px;
+		}
+		h1 {
+			color: #ffffff;
+		}
+		p {
+			color: #e0e0e0;
+		}
+		a {
+			color: #1e90ff;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Добро пожаловать, {{ username }} {{ lastname }}!</h1>
+		</header>
+		<main>
+			<p>Спасибо за регистрацию на нашем онлайн кинотеатре. Мы рады видеть вас среди наших пользователей!</p>
+			<p>Чтобы завершить процесс регистрации, пожалуйста, подтвердите свой email, перейдя по следующей ссылке:</p>
+			<p><a href="{{ confirmation_link }}">Подтвердить регистрацию</a></p>
+			<p>Если у вас возникли вопросы, вы всегда можете связаться с нами, и мы с радостью вам поможем.</p>
+		</main>
+		<footer>
+			<p>С уважением, <br> Команда {{ sender_email }}</p>
+			<p><i>Это автоматическое письмо, пожалуйста, не отвечайте на него.</i></p>
+		</footer>
+	</div>
+</body>
+</html>

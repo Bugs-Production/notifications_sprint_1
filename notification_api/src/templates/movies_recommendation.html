@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+    body {
+        background-color: #1c1c1c; /* Темно-серый фон */
+        color: #d3d3d3; /* Светло-серый текст */
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        background: rgba(0, 0, 0, 0.85); /* Полупрозрачный черный фон для контейнера */
+        padding: 20px;
+        margin: 50px auto;
+        width: 80%;
+        border-radius: 10px;
+        text-align: center;
+    }
+    h1 {
+        color: #ffffff;
+    }
+    p {
+        color: #d3d3d3;
+    }
+    a {
+        color: #1e90ff;
+    }
+    .movie {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .movie img {
+        border-radius: 10px;
+        width: 150px;
+        margin-right: 20px;
+    }
+    .movie-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #f0f0f0;
+    }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Здравствуйте, {{ username }} {{ lastname }}, ваши рекомендации фильмов!</h1>
+        </header>
+        <main>
+            <p>На этой неделе мы подготовили для вас отличные фильмы:</p>
+
+            {% for movie_name, movie_image in movies.items() %}
+            <div class="movie">
+                <img src="{{ movie_image }}" alt="{{ movie_name }}">
+                <div>
+                    <p class="movie-title">{{ movie_name }}</p>
+                    <p>Узнайте больше, посмотрев трейлер или прочитав обзор.</p>
+                </div>
+            </div>
+            {% endfor %}
+
+        </main>
+        <footer>
+            <p>С уважением, <br> Ваша команда {{ sender_email }}</p>
+        </footer>
+    </div>
+</body>
+</html>
