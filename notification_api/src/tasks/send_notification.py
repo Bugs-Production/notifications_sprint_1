@@ -24,54 +24,53 @@ def send_email(event_type: str, notification_data: dict) -> None:
         # TODO - реализовать логику отправки массовых сообщений
         pass
 
-    users_list = notification_data.get("users")
+    users_list = notification_data.get("users", [])
 
-    if users_list:
-        for user in users_list:
-            # подготовка данных для рендеринга шаблона
-            user_data = {
-                template_var: notification_data.get(template_var)
-                or user.get(template_var)
-                for template_var in variables
+    for user in users_list:
+        # подготовка данных для рендеринга шаблона
+        user_data = {
+            template_var: notification_data.get(template_var)
+                          or user.get(template_var)
+            for template_var in variables
+        }
+        user_data["sender_email"] = settings.brevo_sender_email
+
+        # рендеринг шаблона с подготовленными данными
+        rendered_email = jinja_template.render(user_data)
+
+        email_to = user.get("email")
+
+        payload = json.dumps(
+            {
+                "sender": {"name": "Sourabh", "email": settings.brevo_sender_email},
+                "to": [{"email": email_to}],
+                "subject": settings.brevo_subject,
+                "htmlContent": rendered_email,
             }
-            user_data["sender_email"] = settings.brevo_sender_email
+        )
+        headers = {
+            "accept": "application/json",
+            "api-key": settings.brevo_api_key,
+            "content-type": "application/json",
+        }
 
-            # рендеринг шаблона с подготовленными данными
-            rendered_email = jinja_template.render(user_data)
+        response = requests.request(
+            "POST", settings.brevo_url, headers=headers, data=payload
+        )
 
-            email_to = user.get("email")
-
-            payload = json.dumps(
-                {
-                    "sender": {"name": "Sourabh", "email": settings.brevo_sender_email},
-                    "to": [{"email": email_to}],
-                    "subject": settings.brevo_subject,
-                    "htmlContent": rendered_email,
-                }
-            )
-            headers = {
-                "accept": "application/json",
-                "api-key": settings.brevo_api_key,
-                "content-type": "application/json",
-            }
-
-            response = requests.request(
-                "POST", settings.brevo_url, headers=headers, data=payload
-            )
-
-            # сохраняем результат отправки в БД
-            session = get_sync_session()
-            event = Event(
-                type=EventTypesEnum(event_type),
-                channel=ChannelEnum.EMAIL,
-                send_to=email_to,
-                send_from=settings.brevo_sender_email,
-                status=(
-                    EventStatusEnum.SUCCESS
-                    if response.status_code == 201
-                    else EventStatusEnum.FAILED
-                ),
-                template=rendered_email,
-            )
-            session.add(event)
-            session.commit()
+        # сохраняем результат отправки в БД
+        session = get_sync_session()
+        event = Event(
+            type=EventTypesEnum(event_type),
+            channel=ChannelEnum.EMAIL,
+            send_to=email_to,
+            send_from=settings.brevo_sender_email,
+            status=(
+                EventStatusEnum.SUCCESS
+                if response.status_code == 201
+                else EventStatusEnum.FAILED
+            ),
+            template=rendered_email,
+        )
+        session.add(event)
+        session.commit()
