@@ -7,5 +7,5 @@ sync_engine = create_engine(settings.postgres_sync_url)
 SyncSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
 
 
-def get_sync_session() -> SyncSessionLocal:
+def get_sync_session():
     return SyncSessionLocal()
