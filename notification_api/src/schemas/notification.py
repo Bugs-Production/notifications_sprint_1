@@ -18,7 +18,7 @@ class UserInfo(BaseModel):
 
 class BaseEvent(BaseModel):
     mass_mailing: bool
-    users: list[UserInfo] = None
+    users: list[UserInfo] = []
 
 
 class RegistrationEvent(BaseEvent):
@@ -35,6 +35,7 @@ class LikeReviewsEvent(BaseEvent):
 
 
 NOTIFICATION_MAP: dict[NotificationType, Type[BaseModel]] = {
+    # type: ignore
     NotificationType.REGISTRATION.value: RegistrationEvent,
     NotificationType.MOVIE_RECOMMENDATION.value: MovieRecommendationEvent,
     NotificationType.LIKE_NOTIFICATION.value: LikeReviewsEvent,

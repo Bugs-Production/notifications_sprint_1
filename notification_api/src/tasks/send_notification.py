@@ -1,6 +1,6 @@
 import json
 
-import requests
+import requests  # type: ignore
 from core.config import settings
 from core.worker import celery_app
 from jinja2 import Template
@@ -17,39 +17,40 @@ def send_email(event_type: str, notification_data: dict) -> None:
     variables = get_template_variables(template_str)
 
     # в случае массовых сообщений, шлем сообщение на почту всем юзерам
-    mass_maling = notification_data.get("mass_mailing")
+    mass_maling = notification_data.get("mass_mailing")  # type: ignore
     if mass_maling:
         # TODO - реализовать логику отправки массовых сообщений
         pass
 
-    for user in notification_data.get("users"):
-        # подготовка данных для рендеринга шаблона
-        user_data = {
-            template_var: notification_data.get(template_var) or user.get(template_var)
-            for template_var in variables
-        }
-        user_data["sender_email"] = settings.brevo_sender_email
+    users_list = notification_data.get("users")  # type: ignore
 
-        # рендеринг шаблона с подготовленными данными
-        rendered_email = jinja_template.render(user_data)
-
-        email_to = user.get("email")
-
-        payload = json.dumps(
-            {
-                "sender": {"name": "Sourabh", "email": settings.brevo_sender_email},
-                "to": [{"email": email_to}],
-                "subject": settings.brevo_subject,
-                "htmlContent": rendered_email,
+    if users_list:
+        for user in users_list:
+            # подготовка данных для рендеринга шаблона
+            user_data = {
+                template_var: notification_data.get(template_var) or user.get(template_var)  # type: ignore
+                for template_var in variables
             }
-        )
-        headers = {
-            "accept": "application/json",
-            "api-key": settings.brevo_api_key,
-            "content-type": "application/json",
-        }
-        requests.request(
-            "POST", settings.brevo_url, headers=headers, data=payload
-        )
+            user_data["sender_email"] = settings.brevo_sender_email
 
-        # TODO добавить сохранение в таблицу
+            # рендеринг шаблона с подготовленными данными
+            rendered_email = jinja_template.render(user_data)
+
+            email_to = user.get("email")
+
+            payload = json.dumps(
+                {
+                    "sender": {"name": "Sourabh", "email": settings.brevo_sender_email},
+                    "to": [{"email": email_to}],
+                    "subject": settings.brevo_subject,
+                    "htmlContent": rendered_email,
+                }
+            )
+            headers = {
+                "accept": "application/json",
+                "api-key": settings.brevo_api_key,
+                "content-type": "application/json",
+            }
+            requests.request("POST", settings.brevo_url, headers=headers, data=payload)
+
+            # TODO добавить сохранение в таблицу
