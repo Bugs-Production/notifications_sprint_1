@@ -37,7 +37,7 @@ class Event(Base):
         unique=True,
         nullable=False,
     )
-    data = Column(Text, nullable=False)
+    data = Column(Text, nullable=True)
     type = Column(Enum(EventTypesEnum), nullable=False)
     date = Column(DateTime, default=func.now(), nullable=False)
     channel = Column(Enum(ChannelEnum), nullable=False)
@@ -45,7 +45,7 @@ class Event(Base):
     send_to = Column(JSON, nullable=True)  # None - рассылка всем
     send_from = Column(String, nullable=False)
     status = Column(Enum(EventStatusEnum), nullable=False)
-    template = Column(String(200), nullable=False)
+    template = Column(Text, nullable=True)
 
     def __repr__(self) -> str:
         return f"<Event {self.type} {self.id}>"

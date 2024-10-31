@@ -26,6 +26,8 @@ services:
     restart: always
     networks:
       - notification_network
+    volumes:
+      - ./notification_api/src:/notification_api/src
 
   nginx:
     container_name: notification_nginx

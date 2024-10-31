@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+		body {
+			background: url("https://images.unsplash.com/photo-1543980932-b5fc649a8000?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+			no-repeat center center fixed;
+			background-size: cover;
+			color: rgb(198, 198, 198);
+			font-family: Arial, sans-serif;
+		}
+		.container {
+			text-shadow: 2px 2px 5px #000000;
+			background: rgba(0, 0, 0, 0.7);
+			padding: 20px;
+			margin: 50px auto;
+			width: 80%;
+			border-radius: 10px;
+		}
+		h1 {
+			color: #ffffff;
+		}
+		p {
+			color: #e0e0e0;
+		}
+		a {
+			color: #1e90ff;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Приветствуем, {{ username }} {{ lastname }}!</h1>
+		</header>
+		<main>
+			<p>Ваш пост получил новую активность на нашем кинотеатре!</p>
+			<p>Ваш пост был оценен и получил <strong>{{ likes_count }}</strong> лайков.</p>
+			<p>Чтобы просмотреть или продолжить обсуждение вашего поста, перейдите по следующей ссылке:</p>
+			<p><a href="{{ post_link }}">Перейти к посту</a></p>
+			<p>Спасибо, что делитесь с нами своим контентом! Мы ценим вашу активность на нашей платформе.</p>
+		</main>
+		<footer>
+			<p>С уважением, <br> Команда {{ sender_email }}</p>
+			<p><i>Это автоматическое письмо, пожалуйста, не отвечайте на него.</i></p>
+		</footer>
+	</div>
+</body>
+</html>

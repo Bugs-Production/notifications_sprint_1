@@ -13,4 +13,4 @@ dsn = settings.postgres_url
 
 
 async def get_postgres_session() -> AsyncSession:
-    return async_session
+    return async_session  # type: ignore

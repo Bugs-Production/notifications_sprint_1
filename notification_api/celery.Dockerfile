@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r /notification_api/requirements.txt
 
 COPY src /notification_api/src
 
-CMD ["celery", "-A", "main.celery_app", "worker", "--loglevel=info"]
+CMD ["celery", "-A", "core.worker.celery_app", "worker", "--loglevel=info"]
