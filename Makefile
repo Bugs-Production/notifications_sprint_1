@@ -26,3 +26,8 @@ makemigrations:
 .PHONY: migrate
 migrate:
 	docker exec notification_api_service alembic upgrade head
+
+.PHONY: downgrade
+downgrade:
+	@read -p "Enter revision number: " MSG; \
+	 docker exec notification_api_service alembic downgrade "$$MSG"
