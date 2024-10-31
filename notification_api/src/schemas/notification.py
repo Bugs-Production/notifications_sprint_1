@@ -34,8 +34,7 @@ class LikeReviewsEvent(BaseEvent):
     post_link: str
 
 
-NOTIFICATION_MAP: dict[NotificationType, Type[BaseModel]] = {
-    # type: ignore
+NOTIFICATION_MAP = {
     NotificationType.REGISTRATION.value: RegistrationEvent,
     NotificationType.MOVIE_RECOMMENDATION.value: MovieRecommendationEvent,
     NotificationType.LIKE_NOTIFICATION.value: LikeReviewsEvent,

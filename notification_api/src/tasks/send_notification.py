@@ -17,18 +17,19 @@ def send_email(event_type: str, notification_data: dict) -> None:
     variables = get_template_variables(template_str)
 
     # в случае массовых сообщений, шлем сообщение на почту всем юзерам
-    mass_maling = notification_data.get("mass_mailing")  # type: ignore
+    mass_maling = notification_data.get("mass_mailing")
     if mass_maling:
         # TODO - реализовать логику отправки массовых сообщений
         pass
 
-    users_list = notification_data.get("users")  # type: ignore
+    users_list = notification_data.get("users")
 
     if users_list:
         for user in users_list:
             # подготовка данных для рендеринга шаблона
             user_data = {
-                template_var: notification_data.get(template_var) or user.get(template_var)  # type: ignore
+                template_var: notification_data.get(template_var)
+                or user.get(template_var)
                 for template_var in variables
             }
             user_data["sender_email"] = settings.brevo_sender_email
