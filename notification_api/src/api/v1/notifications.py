@@ -19,7 +19,7 @@ async def send_notifications(
 ):
     try:
         event_service.send_email_process(event_type=event_type, event_data=event)
-        return {"detail": "successes"}
+        return {"detail": "success"}
     except NotificationNotFoundError as notification_error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error)
