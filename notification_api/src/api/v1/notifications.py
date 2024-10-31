@@ -21,8 +21,11 @@ async def send_notifications(
         event_service.send_email_process(event_type=event_type, event_data=event)
         return {"detail": "successes"}
     except NotificationNotFoundError as notification_error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error)
+        )
     except ValidationError as validation_error:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(validation_error)
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(validation_error),
         )

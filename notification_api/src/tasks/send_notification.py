@@ -25,7 +25,8 @@ def send_email(event_type: str, notification_data: dict) -> None:
     for user in notification_data.get("users"):
         # подготовка данных для рендеринга шаблона
         user_data = {
-            template_var: notification_data.get(template_var) or user.get(template_var) for template_var in variables
+            template_var: notification_data.get(template_var) or user.get(template_var)
+            for template_var in variables
         }
         user_data["sender_email"] = settings.brevo_sender_email
 
