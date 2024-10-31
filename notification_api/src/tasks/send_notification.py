@@ -48,7 +48,7 @@ def send_email(event_type: str, notification_data: dict) -> None:
             "api-key": settings.brevo_api_key,
             "content-type": "application/json",
         }
-        response = requests.request(
+        requests.request(
             "POST", settings.brevo_url, headers=headers, data=payload
         )
 
