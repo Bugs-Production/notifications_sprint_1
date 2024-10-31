@@ -10,8 +10,8 @@ from services.helpers import get_template_variables
 @celery_app.task
 def send_email(event_type: str, notification_data: dict) -> None:
     # берем шаблон в зависимости от типа эвента
-    with open(f"templates/{event_type}.html", "r") as file:
-        template_str = file.read()
+    with open(f"templates/{event_type}.html", "r") as template:
+        template_str = template.read()
 
     jinja_template = Template(template_str)
     variables = get_template_variables(template_str)
@@ -25,7 +25,7 @@ def send_email(event_type: str, notification_data: dict) -> None:
     for user in notification_data.get("users"):
         # подготовка данных для рендеринга шаблона
         user_data = {
-            var: notification_data.get(var) or user.get(var) for var in variables
+            template_var: notification_data.get(template_var) or user.get(template_var) for template_var in variables
         }
         user_data["sender_email"] = settings.brevo_sender_email
 
@@ -50,6 +50,5 @@ def send_email(event_type: str, notification_data: dict) -> None:
         response = requests.request(
             "POST", settings.brevo_url, headers=headers, data=payload
         )
-        print(f"response {response.text}")
 
         # TODO добавить сохранение в таблицу
