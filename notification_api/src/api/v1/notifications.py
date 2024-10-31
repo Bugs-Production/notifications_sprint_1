@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import ValidationError
-from services.exceptions import NotificationNotFound
+from services.exceptions import NotificationNotFoundError
 from services.notification import NotificationService, get_notification_service
 
 router = APIRouter()
@@ -20,9 +20,9 @@ async def send_notifications(
     try:
         event_service.send_email_process(event_type=event_type, event_data=event)
         return {"detail": "successes"}
-    except NotificationNotFound as e:
+    except NotificationNotFoundError as notification_error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except ValidationError as e:
+    except ValidationError as validation_error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
         )

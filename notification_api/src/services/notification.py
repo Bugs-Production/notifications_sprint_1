@@ -4,7 +4,7 @@ from functools import lru_cache
 from db.postgres import get_postgres_session
 from fastapi import Depends
 from schemas.notification import NOTIFICATION_MAP
-from services.exceptions import NotificationNotFound
+from services.exceptions import NotificationNotFoundError
 from sqlalchemy.ext.asyncio import AsyncSession
 from tasks.send_notification import send_email
 
@@ -26,7 +26,7 @@ class NotificationService(BaseNotificationService):
         notification_type = NOTIFICATION_MAP.get(event_type)
 
         if not notification_type:
-            raise NotificationNotFound("Notification type not found")
+            raise NotificationNotFoundError("Notification type not found")
 
         validate_notification = notification_type(**event_data)
 
