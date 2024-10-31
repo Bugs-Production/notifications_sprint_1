@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     postgres_url: str = Field(
         "postgresql+asyncpg://postgres:postgres@db:5432/foo", alias="POSTGRES_URL"
     )
+    postgres_sync_url: str = Field(
+        "postgresql+psycopg2://postgres:postgres@db:5432/foo", alias="POSTGRES_SYNC_URL"
+    )
     engine_echo: bool = Field(default=False, alias="ENGINE_ECHO")
     brevo_api_key: str = Field("your_api_key", alias="BREVO_API_KEY")
     brevo_url: str = Field("//api.brevo.com/v3/smtp/email", alias="BREVO_URL")

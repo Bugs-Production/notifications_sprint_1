@@ -18,7 +18,7 @@ async def send_notifications(
     event_service: NotificationService = Depends(get_notification_service),
 ):
     try:
-        event_service.send_email_process(event_type=event_type, event_data=event)
+        await event_service.send_email_process(event_type=event_type, event_data=event)
         return {"detail": "success"}
     except NotificationNotFoundError as notification_error:
         raise HTTPException(

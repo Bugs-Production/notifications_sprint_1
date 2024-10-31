@@ -13,7 +13,7 @@ class BaseNotificationService(ABC):
     """Абстрактный класс для отправки уведомлений."""
 
     @abstractmethod
-    def send_email_process(self, event_type: str, event_data: dict) -> None:
+    async def send_email_process(self, event_type: str, event_data: dict) -> None:
         """Отправка сообщений на почту."""
         pass
 
@@ -22,7 +22,7 @@ class NotificationService(BaseNotificationService):
     def __init__(self, postgres_session: AsyncSession):
         self.postgres_session = postgres_session
 
-    def send_email_process(self, event_type: str, event_data: dict) -> None:
+    async def send_email_process(self, event_type: str, event_data: dict) -> None:
         notification_type = NOTIFICATION_MAP.get(event_type)
 
         if not notification_type:

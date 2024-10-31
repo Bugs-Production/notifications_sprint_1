@@ -3,7 +3,9 @@ import json
 import requests  # type: ignore
 from core.config import settings
 from core.worker import celery_app
+from db.sync_postgres import get_sync_session
 from jinja2 import Template
+from models.event import ChannelEnum, Event, EventStatusEnum, EventTypesEnum
 from services.helpers import get_template_variables
 
 
@@ -52,6 +54,24 @@ def send_email(event_type: str, notification_data: dict) -> None:
                 "api-key": settings.brevo_api_key,
                 "content-type": "application/json",
             }
-            requests.request("POST", settings.brevo_url, headers=headers, data=payload)
 
-            # TODO добавить сохранение в таблицу
+            response = requests.request(
+                "POST", settings.brevo_url, headers=headers, data=payload
+            )
+
+            # сохраняем результат отправки в БД
+            session = get_sync_session()
+            event = Event(
+                type=EventTypesEnum(event_type),
+                channel=ChannelEnum.EMAIL,
+                send_to=email_to,
+                send_from=settings.brevo_sender_email,
+                status=(
+                    EventStatusEnum.SUCCESS
+                    if response.status_code == 201
+                    else EventStatusEnum.FAILED
+                ),
+                template=rendered_email,
+            )
+            session.add(event)
+            session.commit()
