@@ -1,15 +1,12 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from celery import Celery
+from api.v1 import notifications
 from core.config import settings
 from db import postgres
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from fastapi_pagination import add_pagination
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-celery_app = Celery(settings.project_name, broker=settings.broker_url)
 
 
 @asynccontextmanager
@@ -31,7 +28,9 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-add_pagination(app)
+app.include_router(
+    notifications.router, prefix="/api/v1/notification", tags=["notifications"]
+)
 
 # Для локального запуска
 if __name__ == "__main__":

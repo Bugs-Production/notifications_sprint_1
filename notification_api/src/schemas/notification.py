@@ -10,11 +10,15 @@ class NotificationType(Enum):
     LIKE_NOTIFICATION = "likes_reviews"
 
 
-class BaseEvent(BaseModel):
+class UserInfo(BaseModel):
     username: str
     lastname: str
     email: str
-    sender_email: str
+
+
+class BaseEvent(BaseModel):
+    mass_mailing: bool
+    users: list[UserInfo] = None
 
 
 class RegistrationEvent(BaseEvent):
@@ -31,7 +35,7 @@ class LikeReviewsEvent(BaseEvent):
 
 
 NOTIFICATION_MAP: dict[NotificationType, Type[BaseModel]] = {
-    NotificationType.REGISTRATION: RegistrationEvent,
-    NotificationType.MOVIE_RECOMMENDATION: MovieRecommendationEvent,
-    NotificationType.LIKE_NOTIFICATION: LikeReviewsEvent,
+    NotificationType.REGISTRATION.value: RegistrationEvent,
+    NotificationType.MOVIE_RECOMMENDATION.value: MovieRecommendationEvent,
+    NotificationType.LIKE_NOTIFICATION.value: LikeReviewsEvent,
 }
