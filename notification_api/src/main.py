@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from api.v1 import notifications
+from api.v1 import admin, notifications
 from core.config import settings
 from db import postgres
 from fastapi import FastAPI
@@ -30,6 +30,9 @@ app = FastAPI(
 
 app.include_router(
     notifications.router, prefix="/api/v1/notification", tags=["notifications"]
+)
+app.include_router(
+    admin.router, prefix="/api/v1/admin/notification", tags=["admin_notifications"]
 )
 
 # Для локального запуска
