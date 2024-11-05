@@ -56,6 +56,19 @@ class AdminNotificationService:
             result = await session.scalars(select(NotificationTask))
             return result.all()
 
+    async def delete_notification_task(self, notification_id: str):
+        async with self.postgres_session() as session:
+            result = await session.scalars(
+                select(NotificationTask).filter_by(id=notification_id)
+            )
+            notification = result.first()
+
+            if notification is None:
+                raise NotificationNotFoundError("Notification not found")
+
+            await session.delete(notification)
+            await session.commit()
+
 
 @lru_cache()
 def get_admin_notification_service(

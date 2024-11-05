@@ -61,3 +61,26 @@ async def get_notifications(
 ) -> Page[GetAdminNotificationSchema]:
     notifications_list = await notification_service.get_notifications_list()
     return paginate(notifications_list)
+
+
+@router.delete(
+    "/{notification_id}",
+    response_model=dict,
+    summary="Удалить задачу на рассылку нотификаций",
+    description="Удаление задачи на отправку сообщений",
+)
+async def delete_notifications(
+    notification_id: str,
+    notification_service: AdminNotificationService = Depends(
+        get_admin_notification_service
+    ),
+):
+    try:
+        await notification_service.delete_notification_task(
+            notification_id=notification_id
+        )
+        return {"detail": "success"}
+    except NotificationNotFoundError as notification_error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error)
+        )
