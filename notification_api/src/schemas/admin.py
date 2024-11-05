@@ -21,3 +21,7 @@ class GetAdminNotificationSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UpdateAdminNotificationSchema(BaseModel):
+    send_date: datetime

@@ -4,3 +4,7 @@ class NotificationNotFoundError(Exception):
 
 class ChannelNotFoundError(Exception):
     pass
+
+
+class ConflictError(Exception):
+    pass

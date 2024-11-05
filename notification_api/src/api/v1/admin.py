@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
 from pydantic import ValidationError
-from schemas.admin import CreateAdminNotificationSchema, GetAdminNotificationSchema
+from schemas.admin import (CreateAdminNotificationSchema, GetAdminNotificationSchema,
+                           UpdateAdminNotificationSchema)
 from services.admin import AdminNotificationService, get_admin_notification_service
 from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
 
@@ -63,13 +64,37 @@ async def get_notifications(
     return paginate(notifications_list)
 
 
+@router.patch(
+    "/{notification_id}",
+    response_model=GetAdminNotificationSchema,
+    summary="Обновить задачу на рассылку нотификаций",
+    description="Обновление рассылки",
+)
+async def update_notification(
+    notification_id: str,
+    notification_data: UpdateAdminNotificationSchema,
+    notification_service: AdminNotificationService = Depends(
+        get_admin_notification_service
+    ),
+):
+    try:
+        updated_notification = await notification_service.update_notification(
+            notification_id=notification_id, notification_data=notification_data
+        )
+        return updated_notification
+    except NotificationNotFoundError as notification_error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error)
+        )
+
+
 @router.delete(
     "/{notification_id}",
     response_model=dict,
     summary="Удалить задачу на рассылку нотификаций",
     description="Удаление задачи на отправку сообщений",
 )
-async def delete_notifications(
+async def delete_notification(
     notification_id: str,
     notification_service: AdminNotificationService = Depends(
         get_admin_notification_service

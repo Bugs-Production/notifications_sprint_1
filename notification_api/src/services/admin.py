@@ -1,18 +1,15 @@
-import logging
 from functools import lru_cache
 
 from db.postgres import get_postgres_session
 from fastapi import Depends
 from models.admin import NotificationTask, NotificationTaskStatusEnum
 from models.event import ChannelEnum, EventTypesEnum
-from schemas.admin import CreateAdminNotificationSchema
-from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
+from schemas.admin import CreateAdminNotificationSchema, UpdateAdminNotificationSchema
+from services.exceptions import ChannelNotFoundError, ConflictError, NotificationNotFoundError
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 class AdminNotificationService:
@@ -55,6 +52,27 @@ class AdminNotificationService:
         async with self.postgres_session() as session:
             result = await session.scalars(select(NotificationTask))
             return result.all()
+
+    async def update_notification(
+        self, notification_id: str, notification_data: UpdateAdminNotificationSchema
+    ) -> NotificationTask | None:
+        async with self.postgres_session() as session:
+            result = await session.scalars(
+                select(NotificationTask).filter_by(id=notification_id)
+            )
+            notification = result.first()
+
+            if notification is None:
+                raise NotificationNotFoundError("Notification not found")
+
+            for field in notification_data.model_fields_set:
+                val = getattr(notification_data, field)
+                setattr(notification, field, val)
+            try:
+                await session.commit()
+            except IntegrityError:
+                raise ConflictError("ConflictError")
+            return notification
 
     async def delete_notification_task(self, notification_id: str):
         async with self.postgres_session() as session:
