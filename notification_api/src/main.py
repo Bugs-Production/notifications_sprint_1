@@ -6,6 +6,7 @@ from core.config import settings
 from db import postgres
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi_pagination import add_pagination
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 
@@ -34,6 +35,8 @@ app.include_router(
 app.include_router(
     admin.router, prefix="/api/v1/admin/notification", tags=["admin_notifications"]
 )
+
+add_pagination(app)
 
 # Для локального запуска
 if __name__ == "__main__":

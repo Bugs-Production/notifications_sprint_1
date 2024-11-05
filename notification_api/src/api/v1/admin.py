@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi_pagination import Page, paginate
 from pydantic import ValidationError
-from schemas.admin import CreateAdminNotificationSchema
+from schemas.admin import CreateAdminNotificationSchema, GetAdminNotificationSchema
 from services.admin import AdminNotificationService, get_admin_notification_service
-from services.exceptions import NotificationNotFoundError, ChannelNotFoundError
+from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
 
 router = APIRouter()
 
@@ -37,3 +38,26 @@ async def send_notifications(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(validation_error),
         )
+
+
+@router.get(
+    "/",
+    response_model=Page[GetAdminNotificationSchema],
+    summary="Получить задачи на рассылку нотификаций",
+    description="Получение списка задач по отправке нотификаций",
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "Ошибка сервера при обработке запроса.",
+            "content": {
+                "application/json": {"example": {"detail": "Internal server error"}}
+            },
+        },
+    },
+)
+async def get_notifications(
+    notification_service: AdminNotificationService = Depends(
+        get_admin_notification_service
+    ),
+) -> Page[GetAdminNotificationSchema]:
+    notifications_list = await notification_service.get_notifications_list()
+    return paginate(notifications_list)

@@ -9,6 +9,7 @@ from schemas.admin import CreateAdminNotificationSchema
 from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,6 +50,11 @@ class AdminNotificationService:
             await session.commit()
             await session.refresh(task)
             return task
+
+    async def get_notifications_list(self) -> NotificationTask | None:
+        async with self.postgres_session() as session:
+            result = await session.scalars(select(NotificationTask))
+            return result.all()
 
 
 @lru_cache()
