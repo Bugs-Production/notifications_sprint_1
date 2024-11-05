@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class CreateAdminNotificationSchema(BaseModel):
     filter: dict
     type: str
-    send_date: datetime
+    send_date: datetime | None = None
     channel: str
 
 

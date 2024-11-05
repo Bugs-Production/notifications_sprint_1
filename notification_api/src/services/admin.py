@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import lru_cache
 
 from db.postgres import get_postgres_session
@@ -29,7 +30,7 @@ class AdminNotificationService:
         except ValueError:
             raise ChannelNotFoundError("Channel not found")
 
-        send_date = notification_data.send_date
+        send_date = notification_data.send_date.replace(tzinfo=None)
 
         if not send_date:
             send_date = func.now()
@@ -67,6 +68,8 @@ class AdminNotificationService:
 
             for field in notification_data.model_fields_set:
                 val = getattr(notification_data, field)
+                if isinstance(val, datetime):
+                    val = val.replace(tzinfo=None)
                 setattr(notification, field, val)
             try:
                 await session.commit()
