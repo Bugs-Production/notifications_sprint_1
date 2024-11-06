@@ -14,12 +14,12 @@ class ChannelEnum(enum.Enum):
 class EventTypesEnum(enum.Enum):
     REGISTRATION = "registration"
     REFRESH_TOKEN_UPDATE = "refresh_token_update"
-    LIKE = "like"
     SERIES = "series"
     NEW_FILMS = "new_films"
     NEWS = "news"
-    SALE = "sale"
     PROMOTION = "promotion"
+    MOVIE_RECOMMENDATION = "movies_recommendation"
+    LIKE_NOTIFICATION = "likes_reviews"
 
 
 class EventStatusEnum(enum.Enum):
