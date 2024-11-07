@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 @celery_app.task
 def send_mass_email(event_type: str, notification_data: dict) -> None:
-    users_data = get_user_info()
-    send_to = [user.get("email") for user in users_data]
-
     template_str = get_template(event_type)
     template_data = prepare_template_data(template_str, notification_data)
 
@@ -26,25 +23,35 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
         logger.warning(exc)
         return
 
-    sender_status_code = email_sender.send_email(rendered_email, send_to)
+    page = 1
+    while True:
+        # Запрашиваем данные о клиентах пачками
+        users_data = get_user_info({"page": {"size": settings.brevo_send_to_limit, "page": page}})
+        if not users_data:
+            break
+        send_to = [user.get("email") for user in users_data]
 
-    # сохраняем результат отправки в БД
-    session = get_sync_session()
-    event = Event(
-        type=EventTypesEnum(event_type),
-        channel=ChannelEnum.EMAIL,
-        send_to=send_to,
-        send_from=settings.brevo_sender_email,
-        status=(
-            EventStatusEnum.SUCCESS
-            if sender_status_code == 201
-            else EventStatusEnum.FAILED
-        ),
-        template=rendered_email,
-    )
-    session.add(event)
-    session.commit()
-    logger.info(f"Notification saved to Database")
+        sender_status_code = email_sender.send_email(rendered_email, send_to)
+
+        # сохраняем результат отправки в БД
+        session = get_sync_session()
+        event = Event(
+            type=EventTypesEnum(event_type),
+            channel=ChannelEnum.EMAIL,
+            send_to=send_to,
+            send_from=settings.brevo_sender_email,
+            status=(
+                EventStatusEnum.SUCCESS
+                if sender_status_code == 201
+                else EventStatusEnum.FAILED
+            ),
+            template=rendered_email,
+        )
+        session.add(event)
+        session.commit()
+        logger.info(f"Notification saved to Database")
+
+        page += 1
 
 
 @celery_app.task
