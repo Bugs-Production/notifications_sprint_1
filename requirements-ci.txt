@@ -2,3 +2,5 @@ black==24.4.2
 isort==5.13.2
 wemake-python-styleguide==0.19.2
 mypy==1.11.2
+types-requests==2.32.0.20241016
+urllib3==2.2.3

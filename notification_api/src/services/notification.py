@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
+from core.logger import notification_logger
 from db.postgres import get_postgres_session
 from fastapi import Depends
 from schemas.notification import NOTIFICATION_MAP
 from services.exceptions import NotificationNotFoundError
 from sqlalchemy.ext.asyncio import AsyncSession
-from tasks.send_notification import send_email
+from tasks.send_notification import send_email, send_mass_email
 
 
 class BaseNotificationService(ABC):
@@ -28,12 +29,24 @@ class NotificationService(BaseNotificationService):
         if not notification_type:
             raise NotificationNotFoundError("Notification type not found")
 
-        validate_notification = notification_type(**event_data)
+        validated_notification = notification_type(**event_data)
+        notification_logger.info(
+            f"Get validated_notification: {validated_notification}"
+        )
 
         # отправка email
-        send_email.delay(
-            event_type=event_type, notification_data=validate_notification.dict()
-        )
+        if validated_notification.mass_mailing:
+            notification_logger.info("Mass mailing started")
+            send_mass_email.delay(
+                event_type=event_type,
+                notification_data=validated_notification.model_dump(),
+            )
+        else:
+            notification_logger.info("Mailing started")
+            send_email.delay(
+                event_type=event_type,
+                notification_data=validated_notification.model_dump(),
+            )
 
 
 @lru_cache()
