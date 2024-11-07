@@ -26,7 +26,9 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
     page = 1
     while True:
         # Запрашиваем данные о клиентах пачками
-        users_data = get_user_info({"page": {"size": settings.brevo_send_to_limit, "page": page}})
+        users_data = get_user_info(
+            {"page": {"size": settings.brevo_send_to_limit, "page": page}}
+        )
         if not users_data:
             break
         send_to = [user.get("email") for user in users_data]
@@ -49,7 +51,7 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
         )
         session.add(event)
         session.commit()
-        logger.info(f"Notification saved to Database")
+        logger.info("Notification saved to Database")
 
         page += 1
 
@@ -88,4 +90,4 @@ def send_email(event_type: str, notification_data: dict) -> None:
         )
         session.add(event)
         session.commit()
-        logger.info(f"Notification saved to Database")
+        logger.info("Notification saved to Database")

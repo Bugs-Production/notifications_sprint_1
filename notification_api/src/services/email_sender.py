@@ -23,7 +23,7 @@ class BrevoEmailClient:
         }
 
     def _create_payload(self, rendered_email, send_to):
-        res = json.dumps(
+        return json.dumps(
             {
                 "sender": {"name": self.sender_name, "email": self.sender_email},
                 "to": [{"email": email} for email in send_to],
@@ -31,7 +31,6 @@ class BrevoEmailClient:
                 "htmlContent": rendered_email,
             }
         )
-        return res
 
     def send_email(self, rendered_email, send_to) -> int:
         response = requests.request(
