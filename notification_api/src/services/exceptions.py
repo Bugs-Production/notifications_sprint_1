@@ -2,6 +2,10 @@ class NotificationNotFoundError(Exception):
     pass
 
 
+class RenderTemplateError(Exception):
+    pass
+
+
 class ChannelNotFoundError(Exception):
     pass
 

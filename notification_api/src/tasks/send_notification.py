@@ -1,75 +1,93 @@
-import json
+import logging
 
-import requests  # type: ignore
 from core.config import settings
 from core.worker import celery_app
 from db.sync_postgres import get_sync_session
-from jinja2 import Template
+from mocked_auth_api.mocked_auth_api import get_user_info
 from models.event import ChannelEnum, Event, EventStatusEnum, EventTypesEnum
-from services.helpers import get_template_variables
+from services.email_sender import email_sender
+from services.exceptions import RenderTemplateError
+from services.helpers import get_template, prepare_template_data, render_template
+
+logger = logging.getLogger(__name__)
 
 
 @celery_app.task
-def send_email(event_type: str, notification_data: dict) -> None:
-    # берем шаблон в зависимости от типа эвента
-    with open(f"templates/{event_type}.html", "r") as template:
-        template_str = template.read()
+def send_mass_email(event_type: str, notification_data: dict) -> None:
+    template_str = get_template(event_type)
+    template_data = prepare_template_data(template_str, notification_data)
 
-    jinja_template = Template(template_str)
-    variables = get_template_variables(template_str)
+    try:
+        rendered_email = render_template(template_str, template_data)
+    except RenderTemplateError as exc:
+        logger.warning(exc)
+        return
 
-    # в случае массовых сообщений, шлем сообщение на почту всем юзерам
-    mass_maling = notification_data.get("mass_mailing")
-    if mass_maling:
-        # TODO - реализовать логику отправки массовых сообщений
-        pass
-
-    users_list = notification_data.get("users", [])
-
-    for user in users_list:
-        # подготовка данных для рендеринга шаблона
-        user_data = {
-            template_var: notification_data.get(template_var) or user.get(template_var)
-            for template_var in variables
-        }
-        user_data["sender_email"] = settings.brevo_sender_email
-
-        # рендеринг шаблона с подготовленными данными
-        rendered_email = jinja_template.render(user_data)
-
-        email_to = user.get("email")
-
-        payload = json.dumps(
-            {
-                "sender": {"name": "Sourabh", "email": settings.brevo_sender_email},
-                "to": [{"email": email_to}],
-                "subject": settings.brevo_subject,
-                "htmlContent": rendered_email,
-            }
+    page = 1
+    while True:
+        # Запрашиваем данные о клиентах пачками
+        users_data = get_user_info(
+            {"page": {"size": settings.brevo_send_to_limit, "page": page}}
         )
-        headers = {
-            "accept": "application/json",
-            "api-key": settings.brevo_api_key,
-            "content-type": "application/json",
-        }
+        if not users_data:
+            break
+        send_to = [user.get("email") for user in users_data]
 
-        response = requests.request(
-            "POST", settings.brevo_url, headers=headers, data=payload
-        )
+        sender_status_code = email_sender.send_email(rendered_email, send_to)
 
         # сохраняем результат отправки в БД
         session = get_sync_session()
         event = Event(
             type=EventTypesEnum(event_type),
             channel=ChannelEnum.EMAIL,
-            send_to=email_to,
+            send_to=send_to,
             send_from=settings.brevo_sender_email,
             status=(
                 EventStatusEnum.SUCCESS
-                if response.status_code == 201
+                if sender_status_code == 201
                 else EventStatusEnum.FAILED
             ),
             template=rendered_email,
         )
         session.add(event)
         session.commit()
+        logger.info("Notification saved to Database")
+
+        page += 1
+
+
+@celery_app.task
+def send_email(event_type: str, notification_data: dict) -> None:
+    users_list = notification_data.get("users", [])
+
+    template_str = get_template(event_type)
+
+    for user in users_list:
+        send_to = user.get("email")
+        template_data = prepare_template_data(template_str, notification_data, user)
+
+        try:
+            rendered_email = render_template(template_str, template_data)
+        except RenderTemplateError as exc:
+            logger.warning(exc)
+            return
+
+        sender_status_code = email_sender.send_email(rendered_email, [send_to])
+
+        # сохраняем результат отправки в БД
+        session = get_sync_session()
+        event = Event(
+            type=EventTypesEnum(event_type),
+            channel=ChannelEnum.EMAIL,
+            send_to=send_to,
+            send_from=settings.brevo_sender_email,
+            status=(
+                EventStatusEnum.SUCCESS
+                if sender_status_code == 201
+                else EventStatusEnum.FAILED
+            ),
+            template=rendered_email,
+        )
+        session.add(event)
+        session.commit()
+        logger.info("Notification saved to Database")

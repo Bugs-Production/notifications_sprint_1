@@ -7,6 +7,7 @@ class NotificationType(Enum):
     REGISTRATION = "registration"
     MOVIE_RECOMMENDATION = "movies_recommendation"
     LIKE_NOTIFICATION = "likes_reviews"
+    PROMOTION = "promotion"
 
 
 class UserInfo(BaseModel):
@@ -17,7 +18,7 @@ class UserInfo(BaseModel):
 
 class BaseEvent(BaseModel):
     mass_mailing: bool
-    users: list[UserInfo] = []
+    users: list[UserInfo] | None = []
 
 
 class RegistrationEvent(BaseEvent):
@@ -33,8 +34,14 @@ class LikeReviewsEvent(BaseEvent):
     post_link: str
 
 
+class MassEvent(BaseEvent):
+    body_header: str
+    body_main: str
+
+
 NOTIFICATION_MAP = {
     NotificationType.REGISTRATION.value: RegistrationEvent,
     NotificationType.MOVIE_RECOMMENDATION.value: MovieRecommendationEvent,
     NotificationType.LIKE_NOTIFICATION.value: LikeReviewsEvent,
+    NotificationType.PROMOTION.value: MassEvent,
 }
