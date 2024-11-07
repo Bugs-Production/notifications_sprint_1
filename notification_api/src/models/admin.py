@@ -31,6 +31,7 @@ class NotificationTask(Base):
     status = Column(pg.ENUM(NotificationTaskStatusEnum), nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     send_date = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=func.now(), nullable=False)
 
     def __repr__(self) -> str:
         return f"<NotificationTask {self.type} {self.id}>"
