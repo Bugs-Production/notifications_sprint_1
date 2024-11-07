@@ -15,6 +15,18 @@ class BrevoEmailClient:
         self.subject = settings.brevo_subject
         self.service_url = settings.brevo_url
 
+    def send_email(self, rendered_email, send_to) -> int:
+        response = requests.request(
+            "POST",
+            settings.brevo_url,
+            headers=self._create_header(),
+            data=self._create_payload(rendered_email, send_to),
+        )
+        if response.status_code == 201:
+            logger.info(f"Email successfully sent to {send_to}")
+
+        return response.status_code
+
     def _create_header(self) -> dict[str, str]:
         return {
             "accept": "application/json",
@@ -31,18 +43,6 @@ class BrevoEmailClient:
                 "htmlContent": rendered_email,
             }
         )
-
-    def send_email(self, rendered_email, send_to) -> int:
-        response = requests.request(
-            "POST",
-            settings.brevo_url,
-            headers=self._create_header(),
-            data=self._create_payload(rendered_email, send_to),
-        )
-        if response.status_code == 201:
-            logger.info(f"Email successfully sent to {send_to}")
-
-        return response.status_code
 
 
 email_sender = BrevoEmailClient()

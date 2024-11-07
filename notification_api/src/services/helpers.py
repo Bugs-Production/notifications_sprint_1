@@ -45,7 +45,10 @@ def prepare_template_data(
 ) -> dict:
     variables = get_template_variables(template_str)
     return {
-        template_var: notification_data.get(template_var)
-        or user_data.get(template_var) if user_data else None
+        template_var: (
+            notification_data.get(template_var) or user_data.get(template_var)
+            if user_data
+            else None
+        )
         for template_var in variables
     }
