@@ -20,7 +20,7 @@ class GetAdminNotificationSchema(BaseModel):
     send_date: datetime
 
     class Config:
-        """Используем режим ORM для корректного преобразования модели из SQLAlchemy"""
+        """Используем режим ORM для корректного преобразования модели из SQLAlchemy."""
 
         orm_mode = True
 
