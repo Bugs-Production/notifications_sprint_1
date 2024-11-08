@@ -7,7 +7,8 @@ from mocked_auth_api.mocked_auth_api import get_user_info
 from models.event import ChannelEnum, Event, EventStatusEnum, EventTypesEnum
 from services.email_sender import email_sender
 from services.exceptions import RenderTemplateError
-from services.helpers import get_template, prepare_template_data, render_template
+from services.helpers import (get_template, prepare_template_data,
+                              render_template)
 
 logger = logging.getLogger(__name__)
 
