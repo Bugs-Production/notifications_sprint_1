@@ -6,11 +6,7 @@ from fastapi import Depends
 from models.admin import NotificationTask, NotificationTaskStatusEnum
 from models.event import ChannelEnum, EventTypesEnum
 from schemas.admin import CreateAdminNotificationSchema, UpdateAdminNotificationSchema
-from services.exceptions import (
-    ChannelNotFoundError,
-    ConflictError,
-    NotificationNotFoundError,
-)
+from services.exceptions import ChannelNotFoundError, ConflictError, NotificationNotFoundError
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
