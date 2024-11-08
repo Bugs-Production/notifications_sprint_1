@@ -1,5 +1,4 @@
 from celery import Celery
-from celery.schedules import crontab
 from core.config import settings
 
 celery_app = Celery(settings.project_name, broker=settings.broker_url)
@@ -11,7 +10,7 @@ celery_app.conf.update(
     beat_schedule={
         "admin_notifications": {
             "task": "tasks.get_admin_notifications.get_admin_notifications",
-            "schedule": crontab(),
+            "schedule": settings.celery_sheduler_interval_sec,
         }
     },
 )
