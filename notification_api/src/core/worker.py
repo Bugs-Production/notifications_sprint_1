@@ -6,9 +6,9 @@ default_queue_name = "default"
 default_exchange_name = "default"
 default_routing_key = "default"
 deadletter_suffix = "deadletter"
-deadletter_queue_name = default_queue_name + f".{deadletter_suffix}"
-deadletter_exchange_name = default_exchange_name + f".{deadletter_suffix}"
-deadletter_routing_key = default_routing_key + f".{deadletter_suffix}"
+deadletter_queue_name = f"{default_queue_name}.{deadletter_suffix}"
+deadletter_exchange_name = f"{default_exchange_name}.{deadletter_suffix}"
+deadletter_routing_key = f"{default_routing_key}.{deadletter_suffix}"
 
 
 class DeclareDLXnDLQ(bootsteps.StartStopStep):
@@ -16,7 +16,7 @@ class DeclareDLXnDLQ(bootsteps.StartStopStep):
     requires = {"celery.worker.components:Pool"}
 
     def start(self, worker):
-        app = worker.app
+        app = worker.app  # type: ignore
 
         # Declare DLX and DLQ
         dlx = Exchange(deadletter_exchange_name, type="direct")
