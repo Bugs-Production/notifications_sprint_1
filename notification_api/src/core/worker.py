@@ -1,4 +1,4 @@
-from celery import Celery, bootsteps
+from celery import Celery, Task, bootsteps
 from core.config import settings
 from kombu import Exchange, Queue
 
@@ -60,3 +60,11 @@ celery_app.conf.update(
     task_default_exchange=default_exchange_name,
     task_default_routing_key=default_routing_key,
 )
+
+
+class BaseConfigTask(Task):
+    autoretry_for = (Exception,)
+    retry_kwargs = {"max_retries": settings.celery_max_retries}
+    retry_backoff = True
+    soft_time_limit = settings.celery_soft_time_limit
+    time_limit = settings.celery_hard_time_limit

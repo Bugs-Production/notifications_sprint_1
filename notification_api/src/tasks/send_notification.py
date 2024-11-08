@@ -1,7 +1,7 @@
 import logging
 
 from core.config import settings
-from core.worker import celery_app
+from core.worker import BaseConfigTask, celery_app
 from db.sync_postgres import get_sync_session
 from mocked_auth_api.mocked_auth_api import get_user_info
 from models.event import ChannelEnum, Event, EventStatusEnum, EventTypesEnum
@@ -12,7 +12,7 @@ from services.helpers import get_template, prepare_template_data, render_templat
 logger = logging.getLogger(__name__)
 
 
-@celery_app.task(acks_late=True)
+@celery_app.task(acks_late=True, base=BaseConfigTask)
 # When acks_late is enabled, the worker can reject the task that will be redelivered to a dead letter queue
 def send_mass_email(event_type: str, notification_data: dict) -> None:
     template_str = get_template(event_type)
@@ -36,6 +36,11 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
 
         sender_status_code = email_sender.send_email(rendered_email, send_to)
 
+        if sender_status_code != 201:
+            raise Exception(
+                f"Email sending failed with status code: {sender_status_code}"
+            )
+
         # сохраняем результат отправки в БД
         session = get_sync_session()
         event = Event(
@@ -43,11 +48,7 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
             channel=ChannelEnum.EMAIL,
             send_to=send_to,
             send_from=settings.brevo_sender_email,
-            status=(
-                EventStatusEnum.SUCCESS
-                if sender_status_code == 201
-                else EventStatusEnum.FAILED
-            ),
+            status=EventStatusEnum.SUCCESS,
             template=rendered_email,
         )
         session.add(event)
@@ -57,7 +58,7 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
         page += 1
 
 
-@celery_app.task(acks_late=True)
+@celery_app.task(acks_late=True, base=BaseConfigTask)
 def send_email(event_type: str, notification_data: dict) -> None:
     users_list = notification_data.get("users", [])
 
@@ -75,6 +76,11 @@ def send_email(event_type: str, notification_data: dict) -> None:
 
         sender_status_code = email_sender.send_email(rendered_email, [send_to])
 
+        if sender_status_code != 201:
+            raise Exception(
+                f"Email sending failed with status code: {sender_status_code}"
+            )
+
         # сохраняем результат отправки в БД
         session = get_sync_session()
         event = Event(
@@ -82,11 +88,7 @@ def send_email(event_type: str, notification_data: dict) -> None:
             channel=ChannelEnum.EMAIL,
             send_to=send_to,
             send_from=settings.brevo_sender_email,
-            status=(
-                EventStatusEnum.SUCCESS
-                if sender_status_code == 201
-                else EventStatusEnum.FAILED
-            ),
+            status=EventStatusEnum.SUCCESS,
             template=rendered_email,
         )
         session.add(event)
