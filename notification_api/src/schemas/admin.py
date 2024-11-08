@@ -4,14 +4,14 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class CreateAdminNotificationSchema(BaseModel):
+class CreateNotificationSchema(BaseModel):
     filter: dict
     type: str
     send_date: datetime | None = None
     channel: str
 
 
-class GetAdminNotificationSchema(BaseModel):
+class GetNotificationSchema(BaseModel):
     id: UUID
     type: str
     channel: str
@@ -25,5 +25,5 @@ class GetAdminNotificationSchema(BaseModel):
         orm_mode = True
 
 
-class UpdateAdminNotificationSchema(BaseModel):
+class UpdateNotificationSchema(BaseModel):
     send_date: datetime

@@ -5,7 +5,7 @@ from db.postgres import get_postgres_session
 from fastapi import Depends
 from models.admin import NotificationTask, NotificationTaskStatusEnum
 from models.event import ChannelEnum, EventTypesEnum
-from schemas.admin import CreateAdminNotificationSchema, UpdateAdminNotificationSchema
+from schemas.admin import CreateNotificationSchema, UpdateNotificationSchema
 from services.exceptions import ChannelNotFoundError, ConflictError, NotificationNotFoundError
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +18,7 @@ class AdminNotificationService:
         self.postgres_session = postgres_session
 
     async def add_notification_task(
-        self, notification_data: CreateAdminNotificationSchema
+        self, notification_data: CreateNotificationSchema
     ) -> NotificationTask:
         try:
             notification_type = EventTypesEnum(notification_data.type)
@@ -55,7 +55,7 @@ class AdminNotificationService:
             return notifications_data.all()
 
     async def update_notification(
-        self, notification_id: str, notification_data: UpdateAdminNotificationSchema
+        self, notification_id: str, notification_data: UpdateNotificationSchema
     ) -> NotificationTask | None:
         async with self.postgres_session() as session:
             notifications_data = await session.scalars(

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
 from pydantic import ValidationError
-from schemas.admin import (CreateAdminNotificationSchema, GetAdminNotificationSchema,
-                           UpdateAdminNotificationSchema)
+from schemas.admin import CreateNotificationSchema, GetNotificationSchema, UpdateNotificationSchema
 from services.admin import AdminNotificationService, get_admin_notification_service
 from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
 
@@ -16,7 +15,7 @@ router = APIRouter()
     description="Создать задачу на отправку сообщений разных типов, в зависимости от типа нотификации",
 )
 async def send_notifications(
-    notification_data: CreateAdminNotificationSchema,
+    notification_data: CreateNotificationSchema,
     notification_service: AdminNotificationService = Depends(
         get_admin_notification_service
     ),
@@ -43,7 +42,7 @@ async def send_notifications(
 
 @router.get(
     "/",
-    response_model=Page[GetAdminNotificationSchema],
+    response_model=Page[GetNotificationSchema],
     summary="Получить задачи на рассылку нотификаций",
     description="Получение списка задач по отправке нотификаций",
     responses={
@@ -59,20 +58,20 @@ async def get_notifications(
     notification_service: AdminNotificationService = Depends(
         get_admin_notification_service
     ),
-) -> Page[GetAdminNotificationSchema]:
+) -> Page[GetNotificationSchema]:
     notifications_list = await notification_service.get_notifications_list()
     return paginate(notifications_list)
 
 
 @router.patch(
     "/{notification_id}",
-    response_model=GetAdminNotificationSchema,
+    response_model=GetNotificationSchema,
     summary="Обновить задачу на рассылку нотификаций",
     description="Обновление рассылки",
 )
 async def update_notification(
     notification_id: str,
-    notification_data: UpdateAdminNotificationSchema,
+    notification_data: UpdateNotificationSchema,
     notification_service: AdminNotificationService = Depends(
         get_admin_notification_service
     ),
