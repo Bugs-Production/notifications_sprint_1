@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_pagination import Page, paginate
 from pydantic import ValidationError
-from schemas.admin import (CreateAdminNotificationSchema, GetAdminNotificationSchema,
-                           UpdateAdminNotificationSchema)
+from schemas.admin import (
+    CreateAdminNotificationSchema,
+    GetAdminNotificationSchema,
+    UpdateAdminNotificationSchema,
+)
 from services.admin import AdminNotificationService, get_admin_notification_service
 from services.exceptions import ChannelNotFoundError, NotificationNotFoundError
 
