@@ -6,7 +6,7 @@ from db.sync_postgres import get_sync_session
 from mocked_auth_api.mocked_auth_api import get_user_info
 from models.event import ChannelEnum, Event, EventStatusEnum, EventTypesEnum
 from services.email_sender import email_sender
-from services.exceptions import RenderTemplateError
+from services.exceptions import EmailSendingError, RenderTemplateError
 from services.helpers import get_template, prepare_template_data, render_template
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
         sender_status_code = email_sender.send_email(rendered_email, send_to)
 
         if sender_status_code != 201:
-            raise Exception(
+            raise EmailSendingError(
                 f"Email sending failed with status code: {sender_status_code}"
             )
 
@@ -77,7 +77,7 @@ def send_email(event_type: str, notification_data: dict) -> None:
         sender_status_code = email_sender.send_email(rendered_email, [send_to])
 
         if sender_status_code != 201:
-            raise Exception(
+            raise EmailSendingError(
                 f"Email sending failed with status code: {sender_status_code}"
             )
 
