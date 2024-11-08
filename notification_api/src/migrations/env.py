@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from core.config import settings
 from db.postgres import Base
+from models.admin import NotificationTask  # noqa
 from models.event import Event  # noqa
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection

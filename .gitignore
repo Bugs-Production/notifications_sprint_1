@@ -9,3 +9,4 @@ nginx/logs
 rabbitmq/
 postgres_data/
 notification_api/logs
+notification_api/src/celerybeat-schedule

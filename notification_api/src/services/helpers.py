@@ -41,7 +41,7 @@ def render_template(template_str: str, template_vars: dict) -> str:
 
 
 def prepare_template_data(
-    template_str: str, notification_data: dict, user_data: dict
+    template_str: str, notification_data: dict, user_data: dict | None = None
 ) -> dict:
     variables = get_template_variables(template_str)
     return {

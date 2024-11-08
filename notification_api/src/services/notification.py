@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
-from core.logger import notification_logger
 from db.postgres import get_postgres_session
 from fastapi import Depends
 from schemas.notification import NOTIFICATION_MAP
@@ -30,19 +29,14 @@ class NotificationService(BaseNotificationService):
             raise NotificationNotFoundError("Notification type not found")
 
         validated_notification = notification_type(**event_data)
-        notification_logger.info(
-            f"Get validated_notification: {validated_notification}"
-        )
 
         # отправка email
         if validated_notification.mass_mailing:
-            notification_logger.info("Mass mailing started")
             send_mass_email.delay(
                 event_type=event_type,
                 notification_data=validated_notification.model_dump(),
             )
         else:
-            notification_logger.info("Mailing started")
             send_email.delay(
                 event_type=event_type,
                 notification_data=validated_notification.model_dump(),
