@@ -52,7 +52,7 @@ celery_app.conf.update(
     beat_schedule={
         "admin_notifications": {
             "task": "tasks.get_admin_notifications.get_admin_notifications",
-            "schedule": settings.celery_sheduler_interval_sec,
+            "schedule": settings.celery_scheduler_interval_sec,
         }
     },
     task_queues=(default_queue,),
