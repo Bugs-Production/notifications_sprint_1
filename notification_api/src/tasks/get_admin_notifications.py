@@ -21,8 +21,10 @@ def update_task_status(
 def get_admin_notifications() -> None:
     logger.info("Executing scheduled task")
     with get_sync_session() as session:
+        time_now = func.now()
         stmt = select(NotificationTask).where(
-            NotificationTask.status == NotificationTaskStatusEnum.INIT
+            NotificationTask.status == NotificationTaskStatusEnum.INIT,
+            NotificationTask.send_date <= time_now,
         )
         notifications_data = session.scalars(stmt)
 
