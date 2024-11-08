@@ -78,10 +78,9 @@ async def update_notification(
     ),
 ):
     try:
-        updated_notification = await notification_service.update_notification(
+        return await notification_service.update_notification(
             notification_id=notification_id, notification_data=notification_data
         )
-        return updated_notification
     except NotificationNotFoundError as notification_error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(notification_error)

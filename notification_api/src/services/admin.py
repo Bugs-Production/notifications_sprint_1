@@ -51,26 +51,26 @@ class AdminNotificationService:
 
     async def get_notifications_list(self) -> NotificationTask | None:
         async with self.postgres_session() as session:
-            result = await session.scalars(select(NotificationTask))
-            return result.all()
+            notifications_data = await session.scalars(select(NotificationTask))
+            return notifications_data.all()
 
     async def update_notification(
         self, notification_id: str, notification_data: UpdateAdminNotificationSchema
     ) -> NotificationTask | None:
         async with self.postgres_session() as session:
-            result = await session.scalars(
+            notifications_data = await session.scalars(
                 select(NotificationTask).filter_by(id=notification_id)
             )
-            notification = result.first()
+            notification = notifications_data.first()
 
             if notification is None:
                 raise NotificationNotFoundError("Notification not found")
 
             for field in notification_data.model_fields_set:
-                val = getattr(notification_data, field)
-                if isinstance(val, datetime):
-                    val = val.replace(tzinfo=None)
-                setattr(notification, field, val)
+                field_value = getattr(notification_data, field)
+                if isinstance(field_value, datetime):
+                    field_value = field_value.replace(tzinfo=None)
+                setattr(notification, field, field_value)
             try:
                 await session.commit()
             except IntegrityError:
@@ -79,10 +79,10 @@ class AdminNotificationService:
 
     async def delete_notification_task(self, notification_id: str):
         async with self.postgres_session() as session:
-            result = await session.scalars(
+            notifications_data = await session.scalars(
                 select(NotificationTask).filter_by(id=notification_id)
             )
-            notification = result.first()
+            notification = notifications_data.first()
 
             if notification is None:
                 raise NotificationNotFoundError("Notification not found")

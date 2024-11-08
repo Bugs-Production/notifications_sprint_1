@@ -24,13 +24,15 @@ def get_admin_notifications() -> None:
         stmt = select(NotificationTask).where(
             NotificationTask.status == NotificationTaskStatusEnum.INIT
         )
-        result = session.scalars(stmt)
+        notifications_data = session.scalars(stmt)
 
-        for row in result.all():
+        for row in notifications_data.all():
             try:
                 update_task_status(row, NotificationTaskStatusEnum.IN_PROGRESS, session)
-                send_mass_email.delay(event_type=row.type.value, notification_data=row.filter)
+                send_mass_email.delay(
+                    event_type=row.type.value, notification_data=row.filter
+                )
                 update_task_status(row, NotificationTaskStatusEnum.SUCCESS, session)
-            except Exception as e:
-                logger.error(e)
+            except Exception as exc:
+                logger.error(exc)
                 update_task_status(row, NotificationTaskStatusEnum.FAILED, session)

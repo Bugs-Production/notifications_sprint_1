@@ -2,11 +2,10 @@ import enum
 import uuid
 
 from db.postgres import Base
+from models.event import ChannelEnum, EventTypesEnum
 from sqlalchemy import JSON, Column, DateTime, func
 from sqlalchemy.dialects import postgresql as pg
 from sqlalchemy.dialects.postgresql import UUID
-
-from .event import ChannelEnum, EventTypesEnum
 
 
 class NotificationTaskStatusEnum(enum.Enum):
