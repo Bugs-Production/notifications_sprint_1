@@ -24,7 +24,9 @@ class Settings(BaseSettings):
     brevo_sender_email: str = Field("example@gmail.com", alias="BREVO_SENDER_EMAIL")
     brevo_sender_name: str = Field("Sender", alias="BREVO_SENDER_NAME")
     brevo_send_to_limit: int = Field(50, alias="BREVO_SEND_TO_LIMIT")
-    celery_sheduler_interval_sec: int = Field(60, alias="CELERY_SHEDULERINTERVAL_SEC")
+    celery_scheduler_interval_sec: int = Field(
+        60, alias="CELERY_SСHEDULER_INTERVAL_SEC"
+    )
 
 
 settings = Settings()

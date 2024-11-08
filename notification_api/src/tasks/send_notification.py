@@ -12,7 +12,8 @@ from services.helpers import get_template, prepare_template_data, render_templat
 logger = logging.getLogger(__name__)
 
 
-@celery_app.task
+@celery_app.task(acks_late=True)
+# When acks_late is enabled, the worker can reject the task that will be redelivered to a dead letter queue
 def send_mass_email(event_type: str, notification_data: dict) -> None:
     template_str = get_template(event_type)
     template_data = prepare_template_data(template_str, notification_data)
@@ -56,7 +57,7 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
         page += 1
 
 
-@celery_app.task
+@celery_app.task(acks_late=True)
 def send_email(event_type: str, notification_data: dict) -> None:
     users_list = notification_data.get("users", [])
 
