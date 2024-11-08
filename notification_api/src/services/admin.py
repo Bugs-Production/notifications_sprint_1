@@ -6,7 +6,7 @@ from fastapi import Depends
 from models.admin import NotificationTask, NotificationTaskStatusEnum
 from models.event import ChannelEnum, EventTypesEnum
 from schemas import admin as admin_schemas
-from services.exceptions import ChannelNotFoundError, ConflictError, NotificationNotFoundError
+from services import exceptions as exc
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,12 +23,12 @@ class AdminNotificationService:
         try:
             notification_type = EventTypesEnum(notification_data.type)
         except ValueError:
-            raise NotificationNotFoundError("Notification type not found")
+            raise exc.NotificationNotFoundError("Notification type not found")
 
         try:
             channel = ChannelEnum(notification_data.channel)
         except ValueError:
-            raise ChannelNotFoundError("Channel not found")
+            raise exc.ChannelNotFoundError("Channel not found")
 
         send_date = notification_data.send_date.replace(tzinfo=None)
 
@@ -66,7 +66,7 @@ class AdminNotificationService:
             notification = notifications_data.first()
 
             if notification is None:
-                raise NotificationNotFoundError("Notification not found")
+                raise exc.NotificationNotFoundError("Notification not found")
 
             for field in notification_data.model_fields_set:
                 field_value = getattr(notification_data, field)
@@ -76,7 +76,7 @@ class AdminNotificationService:
             try:
                 await session.commit()
             except IntegrityError:
-                raise ConflictError("ConflictError")
+                raise exc.ConflictError("ConflictError")
             return notification
 
     async def delete_notification_task(self, notification_id: str):
@@ -87,7 +87,7 @@ class AdminNotificationService:
             notification = notifications_data.first()
 
             if notification is None:
-                raise NotificationNotFoundError("Notification not found")
+                raise exc.NotificationNotFoundError("Notification not found")
 
             await session.delete(notification)
             await session.commit()
