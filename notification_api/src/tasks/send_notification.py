@@ -36,13 +36,25 @@ def send_mass_email(event_type: str, notification_data: dict) -> None:
 
         sender_status_code = email_sender.send_email(rendered_email, send_to)
 
+        session = get_sync_session()
+
         if sender_status_code != 201:
+            event = Event(
+                type=EventTypesEnum(event_type),
+                channel=ChannelEnum.EMAIL,
+                send_to=send_to,
+                send_from=settings.brevo_sender_email,
+                status=EventStatusEnum.FAILED,
+                template=rendered_email,
+            )
+            session.add(event)
+            session.commit()
+            logger.info("Notification saved to Database")
+
             raise EmailSendingError(
                 f"Email sending failed with status code: {sender_status_code}"
             )
 
-        # сохраняем результат отправки в БД
-        session = get_sync_session()
         event = Event(
             type=EventTypesEnum(event_type),
             channel=ChannelEnum.EMAIL,
@@ -76,13 +88,25 @@ def send_email(event_type: str, notification_data: dict) -> None:
 
         sender_status_code = email_sender.send_email(rendered_email, [send_to])
 
+        session = get_sync_session()
+
         if sender_status_code != 201:
+            event = Event(
+                type=EventTypesEnum(event_type),
+                channel=ChannelEnum.EMAIL,
+                send_to=send_to,
+                send_from=settings.brevo_sender_email,
+                status=EventStatusEnum.FAILED,
+                template=rendered_email,
+            )
+            session.add(event)
+            session.commit()
+            logger.info("Notification saved to Database")
+
             raise EmailSendingError(
                 f"Email sending failed with status code: {sender_status_code}"
             )
 
-        # сохраняем результат отправки в БД
-        session = get_sync_session()
         event = Event(
             type=EventTypesEnum(event_type),
             channel=ChannelEnum.EMAIL,
