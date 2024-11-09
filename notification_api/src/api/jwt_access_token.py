@@ -33,14 +33,13 @@ class JWTBearer(HTTPBearer):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Invalid authorization code.",
             )
-        if not credentials.scheme == "Bearer":
+        if credentials.scheme != "Bearer":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Only Bearer token might be accepted",
             )
-        decoded_token = self.decode_and_parse_token(credentials.credentials)
 
-        return decoded_token
+        return self.decode_and_parse_token(credentials.credentials)
 
     @staticmethod
     def decode_and_parse_token(jwt_token: str) -> AccessTokenPayload | None:
