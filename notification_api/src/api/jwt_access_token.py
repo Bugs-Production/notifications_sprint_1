@@ -42,7 +42,7 @@ class JWTBearer(HTTPBearer):
         return self.decode_and_parse_token(credentials.credentials)
 
     @staticmethod
-    def decode_and_parse_token(jwt_token: str) -> AccessTokenPayload | None:
+    def decode_and_parse_token(jwt_token: str) -> AccessTokenPayload:
         try:
             decoded_token = jwt.decode(
                 jwt_token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
