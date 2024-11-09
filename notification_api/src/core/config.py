@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     celery_max_retries: int = Field(default=3, alias="CELERY_MAX_RETRIES")
     celery_soft_time_limit: int = Field(default=300, alias="CELERY_SOFT_TIME_LIMIT")
     celery_hard_time_limit: int = Field(default=600, alias="CELERY_HARD_TIME_LIMIT")
+    jwt_secret_key: str = Field("my_secret_key", alias="JWT_SECRET_KEY")
+    jwt_algorithm: str = Field("my_jwt_algorithm", alias="JWT_ALGORITHM")
 
 
 settings = Settings()
