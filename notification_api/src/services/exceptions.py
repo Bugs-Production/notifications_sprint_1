@@ -12,3 +12,7 @@ class ChannelNotFoundError(Exception):
 
 class ConflictError(Exception):
     pass
+
+
+class EmailSendingError(Exception):
+    pass

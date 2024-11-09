@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     celery_scheduler_interval_sec: int = Field(
         60, alias="CELERY_SСHEDULER_INTERVAL_SEC"
     )
+    celery_max_retries: int = Field(default=3, alias="CELERY_MAX_RETRIES")
+    celery_soft_time_limit: int = Field(default=300, alias="CELERY_SOFT_TIME_LIMIT")
+    celery_hard_time_limit: int = Field(default=600, alias="CELERY_HARD_TIME_LIMIT")
 
 
 settings = Settings()
